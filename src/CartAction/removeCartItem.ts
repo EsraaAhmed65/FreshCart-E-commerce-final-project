@@ -1,19 +1,16 @@
-"use server"
+"use server";
 
-import { getMyToken } from "@/utilities/token"
-import axios from "axios"
+import { getMyToken } from "@/utilities/token";
 
+export async function removeCartItemAction(itemId: string) {
+  const token = await getMyToken();
+  if (!token) throw new Error("Login first");
 
-export async function removeCartItemAction(id: string) {
-   const token = await getMyToken()
-   if (!token) 
-    {
-        throw Error("Login first!")
-    }
-    const {data} = await axios.delete(`https://ecommerce.routemisr.com/api/v1/cart/${id}`, {
-        headers: {
-            token: token as string
-        }
-    })
-    return data
+  const res = await fetch(`${process.env.API}/cart/${itemId}`, {
+    method: "DELETE",
+    headers: { token },
+  });
+
+  const data = await res.json().catch(() => null);
+  return { ok: res.ok, status: data?.status ?? (res.ok ? "success" : "failed"), data };
 }

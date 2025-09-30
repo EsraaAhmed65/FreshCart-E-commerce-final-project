@@ -1,24 +1,21 @@
 "use server";
+
 import { getMyToken } from "@/utilities/token";
-import axios from "axios";
 
-export async function addProductToWishlistAction(id: string) {
+export async function addProductToWishlistAction(productId: string) {
   const token = await getMyToken();
-  if (!token) throw Error("Please, Login First!");
+  if (!token) throw new Error("Login first");
 
-  try {
-    const res = await axios.post(
-      "https://ecommerce.routemisr.com/api/v1/wishlist",
-      { productId: id },
-      { headers: { token: token as string }, timeout: 12000 }
-    );
-    return res.data;
-  } catch (e: any) {
-    const msg =
-      e?.response?.data?.message ||
-      e?.code === "ETIMEDOUT"
-        ? "Request timed out. Try again."
-        : "Failed to add to wishlist";
-    throw Error(msg);
-  }
+  const res = await fetch(`${process.env.API}/wishlist`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      token,
+    },
+    body: JSON.stringify({ productId }),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.message || "Failed to add to wishlist");
+  return data;
 }

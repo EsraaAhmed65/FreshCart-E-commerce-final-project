@@ -1,15 +1,15 @@
-"use server"
 
-import { getMyToken } from "@/utilities/token"
+"use server";
+import { getMyToken } from "@/utilities/token";
 
 export async function getUserCartAction() {
-  const Token = await getMyToken()
-  if (!Token) return null
-  const response = await fetch("https://ecommerce.routemisr.com/api/v1/cart", {
-    headers: { token: Token as string },
-    cache: "no-store"
-  })
-  if (!response.ok) return null
-  const data = await response.json()
-  return data
+  const token = await getMyToken();
+  if (!token) return null;
+
+  const res = await fetch(`${process.env.API}/cart`, {
+    headers: { token },
+    cache: "no-store",
+  });
+  if (!res.ok) return null;
+  return res.json();
 }

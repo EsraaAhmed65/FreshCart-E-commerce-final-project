@@ -1,20 +1,20 @@
 "use server";
 
 import { getMyToken } from "@/utilities/token";
-import axios from "axios";
 
-export async function updateCartAction(id: string, count: number) {
-    const token = await getMyToken()
-    if (!token) {
-        throw Error("Login first!");
-    }
-    const value = {
-        count: count
-    }
-    const { data } = await axios.put(`https://ecommerce.routemisr.com/api/v1/cart/${id}`, value, {
-        headers: {
-            token: token as string
-        }
-        })
-        return data;
+export async function updateCartAction(itemId: string, count: number) {
+  const token = await getMyToken();
+  if (!token) throw new Error("Login first");
+
+  const res = await fetch(`${process.env.API}/cart/${itemId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      token,
+    },
+    body: JSON.stringify({ count }),
+  });
+
+  const data = await res.json().catch(() => null);
+  return { ok: res.ok, status: data?.status ?? (res.ok ? "success" : "failed"), data };
 }
