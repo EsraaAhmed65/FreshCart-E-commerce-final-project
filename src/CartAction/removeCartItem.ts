@@ -1,16 +1,10 @@
 "use server";
-
 import { getMyToken } from "@/utilities/token";
+import { http } from "@/lib/http";
 
-export async function removeCartItemAction(itemId: string) {
+export async function removeCartItemAction(id: string) {
   const token = await getMyToken();
-  if (!token) throw new Error("Login first");
-
-  const res = await fetch(`${process.env.API}/cart/${itemId}`, {
-    method: "DELETE",
-    headers: { token },
-  });
-
-  const data = await res.json().catch(() => null);
-  return { ok: res.ok, status: data?.status ?? (res.ok ? "success" : "failed"), data };
+  if (!token) throw Error("Login first!");
+  const { data } = await http.delete(`/cart/${id}`, { headers: { token: token as string } });
+  return data;
 }

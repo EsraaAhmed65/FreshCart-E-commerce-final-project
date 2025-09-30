@@ -1,21 +1,10 @@
 "use server";
-
 import { getMyToken } from "@/utilities/token";
+import { http } from "@/lib/http";
 
-export async function addProductToWishlistAction(productId: string) {
+export async function addProductToWishlistAction(id: string) {
   const token = await getMyToken();
-  if (!token) throw new Error("Login first");
-
-  const res = await fetch(`${process.env.API}/wishlist`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      token,
-    },
-    body: JSON.stringify({ productId }),
-  });
-
-  const data = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(data?.message || "Failed to add to wishlist");
+  if (!token) throw Error("Please, Login First!");
+  const { data } = await http.post("/wishlist", { productId: id }, { headers: { token: token as string } });
   return data;
 }
